@@ -16,7 +16,7 @@ public class Server {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         Map<String, String> tsv = new HashMap<>();
         Map<String, Integer> basket = new HashMap<>();
-        //Set<Map.Entry<String, Integer>> entrySet = basket.entrySet();
+        Map<String, Integer> resultBasket = new HashMap<>();
         File file = new File("src/categories.tsv");
         BufferedReader TSVFile = null;
         try {
@@ -31,7 +31,6 @@ public class Server {
             throw new RuntimeException(e);
         }
         while (dataRow != null) {
-
             String[] parts = dataRow.split("\t");
             tsv.put(parts[0], parts[1]);
             try {
@@ -40,7 +39,6 @@ public class Server {
                 throw new RuntimeException(e);
             }
         }
-
         //Открываем серверный socket, используем try,catch, т.к. socket требует закрытия
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Server is started");
@@ -55,7 +53,6 @@ public class Server {
                      BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
                     out.println("Server started");
                     String fileIn = in.readLine();
-
                     JSONParser parser = new JSONParser();
                     Object obj = null;
                     try {
@@ -65,45 +62,28 @@ public class Server {
                     }
                     JSONObject jsonObject = (JSONObject) obj;
                     System.out.println(jsonObject);
+
                     Object key = jsonObject.get("title");
                     Object sumFromClient = jsonObject.get("sum");
                     Object date = jsonObject.get("date");
                     int sumClient = Integer.parseInt((String) sumFromClient);
-
-                    //Записываем ответ в виде json файла
-                    Map object = new LinkedHashMap();
-                    //JSONObject object = new JSONObject();
-                    File fileOut = new File("category.json");
-                    //Сравнение есть ли в мапе и json данные продукты
+                    Counter counter = new Counter(tsv, basket);
                     String category = tsv.get(key);
                     if (category == null) {
                         category = "другое";
                     }
-
-                    boolean keyTrue = tsv.containsKey(key);
-                    boolean basketTrue = basket.containsKey(category);
-
-                    if (keyTrue) {
-                        if (basketTrue) {
-                            int sumPrevious = basket.get(category);
-                            int generalSum = sumPrevious + sumClient;
-                            basket.put(category, generalSum);
-                        } else {
-                            basket.put(category, sumClient);
-                        }
+                    if (basket == null) {
+                        basket.put(category, sumClient);
+                        counter = new Counter(tsv, basket);
                     } else {
-                        if (basketTrue) {
-                            int sumPrevious = basket.get(category);
-                            int generalSum = sumPrevious + sumClient;
-                            basket.put(category, generalSum);
-                        } else {
-                            basket.put(category, sumClient);
-                        }
+                        counter = new Counter(tsv, basket);
+                        basket = counter.categoryCount(key, sumClient);
                     }
-
-                    Counter counter = new Counter(basket);
+                    counter = new Counter(tsv, basket);
+                    //Записываем ответ в виде json файла
+                    Map object = new LinkedHashMap();
+                    //JSONObject object = new JSONObject();
                     List<String> listCounter = counter.count();
-
                     String categoryMax = listCounter.get(1);
                     int maxSum = Integer.parseInt(listCounter.get(0));
 
@@ -112,7 +92,7 @@ public class Server {
 
                     String jsonText = JSONValue.toJSONString(object);
                     System.out.println(jsonText);
-
+                    File fileOut = new File("category.json");
                     try (
                             FileWriter files = new FileWriter(fileOut)) {
                         files.write(jsonText.toString());
