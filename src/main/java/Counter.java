@@ -11,12 +11,13 @@ public class Counter {
     private int max = -1;
     private String keyMax = "1";
 
-    public Counter(Map<String, String> tsv,Map<String, Integer> basket)  {
-        this.tsv=tsv;
-        this.basket=basket;
+    public Counter(Map<String, String> tsv, Map<String, Integer> basket) {
+        this.tsv = tsv;
+        this.basket = basket;
     }
-    public Map<String, Integer> categoryCount(Object key,Integer sumClient) {
-       //Сравнение есть ли в мапе и json данные продукты
+
+    public Map<String, Integer> categoryCount(Object key, Integer sumClient) {
+        //Сравнение есть ли в мапе и json данные продукты
         String category = tsv.get(key);
         if (category == null) {
             category = "другое";
