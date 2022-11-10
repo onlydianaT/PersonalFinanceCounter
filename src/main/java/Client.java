@@ -19,7 +19,7 @@ public class Client {
     private static final String HOST = null;
 
     public static void main(String[] args) throws ParseException {
-        SimpleDateFormat formater = new SimpleDateFormat("2022-11-05");
+        SimpleDateFormat formater = new SimpleDateFormat("2019-11-05");
         Date date = new Date();
         //Открываем клиентский socket, используем try,catch, т.к. socket требует закрытия
         try (Socket clientSocket = new Socket(HOST, PORT);
