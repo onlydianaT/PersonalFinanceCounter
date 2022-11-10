@@ -16,10 +16,13 @@ public class Server {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         Map<String, String> tsv = new HashMap<>();
         Map<String, Integer> basket = new HashMap<>();
-
+        Map<String, Integer> basketYear = new HashMap<>();
+        Map<String, Integer> basketMonth = new HashMap<>();
+        Map<String, Integer> basketDay = new HashMap<>();
+        Map object = new LinkedHashMap();
+        List<String> listDate = new ArrayList<>();
         File file = new File("src/categories.tsv");
         File fileBin = new File("src/data.bin");
-        String[] dateArray = new String[10];
 
         BufferedReader TSVFile = null;
         try {
@@ -65,7 +68,7 @@ public class Server {
                         throw new RuntimeException(e);
                     }
 
-                    Counter counter = new Counter(tsv, basket);
+                    Counter counter = new Counter(tsv, basket, basketYear, basketMonth, basketDay);
                     JSONObject jsonObject = (JSONObject) obj;
                     System.out.println(jsonObject);
 
@@ -82,7 +85,7 @@ public class Server {
                     if (fileBin.exists()) {
                         InputStreamReader inBin = new InputStreamReader(new FileInputStream(fileBin));
                         BufferedReader bufferedReader = new BufferedReader(inBin);
-                        //while (true){
+
                         String lineUploadBin = bufferedReader.readLine();
                         String[] parts = lineUploadBin.split(" ");
                         String[] bin = new String[parts.length];
@@ -100,49 +103,58 @@ public class Server {
                             }
                         }
 
-                        dateArray = new String[parts.length];
                         for (int j = 0; j < bin.length - 1; j++) {
                             for (char ch : bin[j].toCharArray()) {
                                 if (Character.isLetter(ch)) {
-                                    basket = counter.categoryCount(bin[j], Integer.valueOf(bin[j + 2]));
-                                    if (j + 1 < bin.length - 1) {
-                                        dateArray[j] = bin[j + 1];
-                                    }
+                                    basket = counter.categoryCount((bin[j] + " " + bin[j + 1]), Integer.valueOf(bin[j + 2]));
+                                    basketYear = counter.countMaxYearCategory((bin[j] + " " + bin[j + 1]), Integer.valueOf(bin[j + 2]), String.valueOf(date));
+                                    basketMonth = counter.countMaxMonthCategory((bin[j] + " " + bin[j + 1]), Integer.valueOf(bin[j + 2]), String.valueOf(date));
+                                    basketDay = counter.countMaxDayCategory((bin[j] + " " + bin[j + 1]), Integer.valueOf(bin[j + 2]), String.valueOf(date));
                                     break;
                                 }
                             }
-                            j += 2;
+                            if (bin[j] != "") {
+                                j += 2;
+                            }
                         }
                     }
-
-                    List<String> listDate = new ArrayList<>();
-                    for (int j = 0; j < dateArray.length; j++) {
-                        if (dateArray[j] != null) {
-                            listDate.add(dateArray[j]);
-                        }
-                    }
-                    counter = new Counter(tsv, basket);
-                    String category = tsv.get(key);
-                    if (category == null) {
-                        category = "другое";
-                    }
-                    if (basket == null) {
-                        basket.put(category, sumClient);
-                        counter = new Counter(tsv, basket);
-                    } else {
-                        counter = new Counter(tsv, basket);
-                        basket = counter.categoryCount(key, sumClient);
-                    }
-
-                    counter = new Counter(tsv, basket);
                     //Записываем ответ в виде json файла
-                    Map object = new LinkedHashMap();
-                    //JSONObject object = new JSONObject();
+
                     List<String> listCounter = counter.count();
-                    String categoryMax = listCounter.get(1);
-                    int maxSum = Integer.parseInt(listCounter.get(0));
+                    List<String> listCounterYear = counter.countYear();
+                    List<String> listCounterMonth = counter.countMonth();
+                    List<String> listCounterDay = counter.countDay();
+
+                    String categoryMax = "";
+                    int maxSum = 0;
+                    categoryMax = listCounter.get(1);
+                    maxSum = Integer.parseInt(listCounter.get(0));
+
+                    String categoryMaxYear = listCounterYear.get(1);
+                    int maxSumYear = Integer.parseInt(listCounterYear.get(0));
+                    String categoryMaxMonth = listCounterMonth.get(1);
+                    int maxSumMonth = Integer.parseInt(listCounterMonth.get(0));
+                    String categoryMaxDay = listCounterDay.get(1);
+                    int maxSumDay = Integer.parseInt(listCounterDay.get(0));
+
                     object.put("maxCategory: { category: ", categoryMax);
                     object.put("sum", maxSum);
+                    object.put("maxYearCategory: { category: ", categoryMaxYear);
+                    object.put("sumYear", maxSumYear);
+                    object.put("maxMonthCategory: { category: ", categoryMaxMonth);
+                    object.put("sumMonth", maxSumMonth);
+                    object.put("maxDayCategory: { category: ", categoryMaxDay);
+                    object.put("sumDay", maxSumDay);
+
+                    basket.clear();
+                    basketDay.clear();
+                    basketMonth.clear();
+                    basketYear.clear();
+
+                    listCounterDay.removeAll(listCounterDay);
+                    listCounterMonth.removeAll(listCounterMonth);
+                    listCounterYear.removeAll(listCounterYear);
+
                     String jsonText = JSONValue.toJSONString(object);
                     File fileOut = new File("category.json");
                     try (
@@ -151,8 +163,6 @@ public class Server {
                         files.flush();
                         out.println(fileOut);
                     }
-
-
                 } catch (IOException e) {
                     System.out.println("Не могу стартовать сервер");
                     e.printStackTrace();
