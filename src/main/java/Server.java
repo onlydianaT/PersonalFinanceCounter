@@ -137,7 +137,7 @@ public class Server {
                     String categoryMaxDay = listCounterDay.get(1);
                     int maxSumDay = Integer.parseInt(listCounterDay.get(0));
 
-                    object.put("maxCategory: { category: ", categoryMax);
+                    object.put("maxYearCategory: { category: ", categoryMax);
                     object.put("sum", maxSum);
                     object.put("maxYearCategory: { category: ", categoryMaxYear);
                     object.put("sumYear", maxSumYear);
