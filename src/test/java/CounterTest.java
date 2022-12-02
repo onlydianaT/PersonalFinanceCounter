@@ -43,7 +43,7 @@ public class CounterTest  {
     public void testTestCategoryCount(Object key, Integer sumClient) {
         String category = tsv.get(key);
         basket.put(category,sumClient);
-        assertSame(basket,counter.categoryCount(key,sumClient));
+        assertSame(basket,counter.categoryCount(String.valueOf(key),sumClient));
     }
 
     @ParameterizedTest
@@ -57,7 +57,7 @@ public class CounterTest  {
         Counter counter=new Counter(tsv1,basket);
         String category = tsv.get(key);
         basket.put(category,sumClient);
-        Assertions.assertSame(basket,counter.categoryCount(key,sumClient));
+        Assertions.assertSame(basket,counter.categoryCount(String.valueOf(key),sumClient));
     }
     @Test
     public void testTestCount() {
