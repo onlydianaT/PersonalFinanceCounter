@@ -22,6 +22,11 @@ public class Counter {
         this.basketMonth = basketMonth;
         this.basketDay = basketDay;
     }
+    public Counter(Map<String, String> tsv, Map<String, Integer> basket) {
+        this.tsv = tsv;
+        this.basket = basket;
+
+    }
 
     public List<String> count() {
         int max = -1;
