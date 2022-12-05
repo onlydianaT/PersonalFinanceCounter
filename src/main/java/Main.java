@@ -57,18 +57,17 @@ public class Main {
                      //Создаем поток ввода
                      BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
                     out.println("Server started");
-                    String fileIn = in.readLine();
+                    String purchase = in.readLine();
                     JSONParser parser = new JSONParser();
                     Object obj = null;
                     try {
-                        obj = parser.parse(new FileReader(fileIn));
+                        obj = parser.parse(purchase);
                     } catch (ParseException e) {
                         throw new RuntimeException(e);
                     }
 
                     Counter counter = new Counter(tsv, basket, basketYear, basketMonth, basketDay);
                     JSONObject jsonObject = (JSONObject) obj;
-                    System.out.println(jsonObject);
 
                     Object key = jsonObject.get("title");
                     Object sumFromClient = jsonObject.get("sum");
@@ -154,13 +153,7 @@ public class Main {
                     listCounterYear.removeAll(listCounterYear);
 
                     String jsonText = JSONValue.toJSONString(object);
-                    File fileOut = new File("category.json");
-                    try (
-                            FileWriter files = new FileWriter(fileOut)) {
-                        files.write(jsonText.toString());
-                        files.flush();
-                        out.println(fileOut);
-                    }
+                    out.println(jsonText);
                 } catch (IOException e) {
                     System.out.println("Не могу стартовать сервер");
                     e.printStackTrace();

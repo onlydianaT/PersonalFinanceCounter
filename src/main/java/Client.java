@@ -35,31 +35,20 @@ public class Client {
             String[] parts = new String[2];
             String line = scanner.nextLine();
             parts = line.split(" ");
-            //сохранение в json файл
+            //сохранение в json формат
             JSONObject obj = new JSONObject();
-            File file = new File("purchase.json");
             obj.put("title", parts[0]);
             obj.put("date", formater.format(date));
             obj.put("sum", parts[1]);
+            out.println(obj);
 
-            try (FileWriter files = new FileWriter(file)) {
-                files.write(obj.toString());
-                files.flush();
-                out.println(file);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            String fileIn = in.readLine();
+            String reply = in.readLine();
             JSONParser parser = new JSONParser();
             try {
-                Object object = parser.parse(new FileReader(fileIn));
-                JSONObject jsonObject = (JSONObject) object;
-
-                String jsonText = JSONValue.toJSONString(object);
+                Object object = parser.parse(reply);
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 System.out.println(gson.toJson(object).toString());
-            } catch (IOException | ParseException e) {
+            } catch (ParseException e) {
                 e.printStackTrace();
             }
 
