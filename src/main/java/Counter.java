@@ -203,7 +203,6 @@ public class Counter {
         }
         list.add(String.valueOf(max));
         list.add(keyMax);
-        System.out.println("лист" + list);
         return list;
     }
 
