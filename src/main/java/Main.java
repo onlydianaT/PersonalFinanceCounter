@@ -69,11 +69,10 @@ public class Main {
                     Counter counter = new Counter(tsv, basket, basketYear, basketMonth, basketDay);
                     JSONObject jsonObject = (JSONObject) obj;
 
-                    Object key = jsonObject.get("title");
-                    Object sumFromClient = jsonObject.get("sum");
+                    String key = (String) jsonObject.get("title");
+                    String sumFromClient = String.valueOf(jsonObject.get("sum"));
                     Object date = jsonObject.get("date");
-                    int sumClient = Integer.parseInt((String) sumFromClient);
-                    String lineSaveBin = key + " " + date + " " + sumClient;
+                    String lineSaveBin = key + " " + date + " " + sumFromClient;
 
                     ObjectOutputStream outBin = new ObjectOutputStream(new FileOutputStream(fileBin, true));
                     outBin.writeObject(lineSaveBin + " ");
@@ -115,7 +114,6 @@ public class Main {
                             }
                         }
                     }
-                    //Записываем ответ в виде json файла
 
                     List<String> listCounter = counter.count();
                     List<String> listCounterYear = counter.countYear();
