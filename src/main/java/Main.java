@@ -70,12 +70,12 @@ public class Main {
                     JSONObject jsonObject = (JSONObject) obj;
 
                     String key = (String) jsonObject.get("title");
-                    String sumFromClient = String.valueOf(jsonObject.get("sum"));
+                    int sumFromClient = Integer.parseInt(((String)jsonObject.get("sum")));
                     Object date = jsonObject.get("date");
-                    String lineSaveBin = key + " " + date + " " + sumFromClient;
+                    String lineSaveBin = key + " " + date;
 
                     ObjectOutputStream outBin = new ObjectOutputStream(new FileOutputStream(fileBin, true));
-                    outBin.writeObject(lineSaveBin + " ");
+                    outBin.writeObject(lineSaveBin + " "+ sumFromClient+" ");
                     outBin.close();
 
                     if (fileBin.exists()) {
@@ -102,7 +102,7 @@ public class Main {
                         for (int j = 0; j < bin.length - 1; j++) {
                             for (char ch : bin[j].toCharArray()) {
                                 if (Character.isLetter(ch)) {
-                                    basket = counter.categoryCount((bin[j] + " " + bin[j + 1]), Integer.valueOf(bin[j + 2]));
+                                    basket = counter.categoryCount((bin[j] + " " + bin[j + 1]), Integer.valueOf((bin[j + 2])));
                                     basketYear = counter.countMaxYearCategory((bin[j] + " " + bin[j + 1]), Integer.valueOf(bin[j + 2]), String.valueOf(date));
                                     basketMonth = counter.countMaxMonthCategory((bin[j] + " " + bin[j + 1]), Integer.valueOf(bin[j + 2]), String.valueOf(date));
                                     basketDay = counter.countMaxDayCategory((bin[j] + " " + bin[j + 1]), Integer.valueOf(bin[j + 2]), String.valueOf(date));
